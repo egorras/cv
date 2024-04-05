@@ -20,9 +20,30 @@ jobs:
           usePuppeteer: true
           useScreen: true
           pdfOptions: '{"format": "A4", "margin": {"top": "10mm", "left": "10mm", "right": "10mm", "bottom": "10mm"}}'
-          
+
       - name: Upload PDF to Artifacts
         uses: actions/upload-artifact@v2
         with:
-          name: cv.pdf
+          name: cv-pdf
           path: cv.pdf
+
+      - name: Create Release
+        id: create_release
+        uses: actions/create-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tag_name: cv-${{ github.run_number }}
+          release_name: CV Release ${{ github.run_number }}
+          draft: false
+          prerelease: false
+  
+      - name: Upload CV PDF to Release
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: ./cv.pdf
+          asset_name: cv.pdf
+          asset_content_type: application/pdf
