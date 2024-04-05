@@ -11,31 +11,18 @@ jobs:
 
     steps:
       - uses: actions/checkout@v2
-
-      - name: Setup Node.js
-        uses: actions/setup-node@v2
+      
+      - name: html to pdf
+        uses: misaelnieto/web_to_pdf_action@master
         with:
-          node-version: '14'
-
-      - name: Install Puppeteer
-        run: |
-          npm install puppeteer
-          echo "PUPPETEER_SKIP_CHROMIUM_DOWNLOAD=true" >> $GITHUB_ENV
-
-      - name: Convert CV to PDF
-        run: |
-          const puppeteer = require('puppeteer');
-          (async () => {
-            const browser = await puppeteer.launch();
-            const page = await browser.newPage();
-            await page.goto('https://egorras.github.io/cv', {waitUntil: 'networkidle2'});
-            await page.pdf({path: 'cv.pdf', format: 'A4'});
-            await browser.close();
-          })();
-        shell: node {0}
-
+          webPageURL: https://egorras.github.io/cv
+          outputFile: cv.pdf
+          usePuppeteer: true
+          useScreen: true
+          pdfOptions: '{"format": "A4", "margin": {"top": "10mm", "left": "10mm", "right": "10mm", "bottom": "10mm"}}'
+          
       - name: Upload PDF to Artifacts
         uses: actions/upload-artifact@v2
         with:
-          name: cv
+          name: cv.pdf
           path: cv.pdf
